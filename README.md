@@ -324,30 +324,37 @@ generates more lines than fit on screen, you can simply use <kbd>PgUp</kbd> and 
 scroll through the excess lines. (Note: On some terminals, you have to additionally hold
 <kbd>Shift</kbd> or, otherwise, it will scroll the terminal buffer instead.)
 
-### Use a custom backend for recent directories
-Autocomplete comes with its own backend for keeping track of and listing recent directories (which
-uses part of
-[`cdr`](https://zsh.sourceforge.io/Doc/Release/User-Contributions.html#Recent-Directories) under the
-hood). However, you can override this and supply Autocomplete with recent directories from any
-source that you like. To do so, define a function like this:
+### Use a custom backend for recent directories/files
+Autocomplete by default uses [`cdr`](
+https://zsh.sourceforge.io/Doc/Release/User-Contributions.html#Recent-Directories)
+to keeping track of and list recent directories (but not files). Override the following two
+functions to supply Autocomplete with recent directories/files from any source that you like:
 
-```sh
-+autocomplete:recent-directories() {
-  <code>
-  typeset -ga reply=( <any number of absolute paths> )
+```zsh
+# This function should populate an array $reply with a list of absolute paths. Path completions are
+# listed in the same order as in this array.
+chpwd_recent_filehandler() {
+  reply=( '/first/recent/dir' '/recent/file' '/second/recent/dir' )
 }
+
+# Called whenever you change dirs, to give you a chance to write the new dir to file.
+# NOTE: If you override the function above, then you are *required* to override this one, too. Can
+# be left empty, though.
+chpwd_recent_dirs() {}
 ```
 
-#### Add a backend for recent files
-Out of the box, Autocomplete doesn't track or offer recent files. However, it will do so if you add
-a backend for it:
-
-```sh
-+autocomplete:recent-files() {
-  <code>
-  typeset -ga reply=( <any number of absolute paths> )
-}
+### Auto-include recent directories
+Instead of having to press a keyboard shortcut, you can automatically include recent directories
+whenever directories are listed:
+```zsh
+# Show recent dirs unless the current word is empty or equal to an existing directory.
+zstyle -e ':completion:*:directories' fake '
+    [[ -z $PREFIX$SUFFIX || -d $PREFIX$SUFFIX ]] ||
+        +autocomplete:recent-directories
+'
+zstyle ':completion:*:directories' sort no
 ```
+
 
 ## Troubleshooting
 Try the steps in the
