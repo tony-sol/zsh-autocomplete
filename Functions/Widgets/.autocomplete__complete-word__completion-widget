@@ -18,10 +18,10 @@ case $curcontext in
   compargs=( - recent-paths _autocomplete__recent_paths )
 ;;
 ( * )
-  if [[ $WIDGET == spell-word ||
-        -v _autocomplete__partial_list && $WIDGETSTYLE == (|*-)(list|menu)(|-*) ]] ||
-     [[ $_lastcomp[unambiguous] != (|$PREFIX$SUFFIX) ]] && _autocomplete__should_insert_unambiguous
-  then
+  if  [[ $WIDGET == spell-word ]] ||
+      [[ -v _autocomplete__partial_list && $WIDGETSTYLE == (|*-)(list|menu)(|-*) ]] ||
+      { [[ $_lastcomp[unambiguous] != (|$PREFIX$SUFFIX) ]] &&
+        _autocomplete__should_insert_unambiguous }; then
     compstate[old_list]=
   fi
 ;;
